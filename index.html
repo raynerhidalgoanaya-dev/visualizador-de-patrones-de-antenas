@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Visualizador de Patrones de Radiación de Antenas</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+<h1>Visualizador de Patrones de Radiación de Antenas</h1>
+<p>Herramienta educativa para analizar patrones de radiación de antenas básicas en telecomunicaciones</p>
+</header>
+<div class="status-bar">
+<div class="status-info">
+<div class="status-item">
+<div class="status-dot"></div>
+<span>Sistema Activo</span>
+</div>
+<div class="status-item">
+<span>Modo: <strong>Actualización Automática</strong></span>
+</div>
+</div>
+<div class="status-item">
+<span>Última actualización: <strong id="last-update">--:--:--</strong></span>
+</div>
+</div>
+<main>
+<aside aria-label="Panel de controles">
+<section class="antenna-selector" aria-labelledby="tipo-antena-title">
+<h2 id="tipo-antena-title">Tipo de Antena</h2>
+<div class="radio-group">
+<label class="radio-option">
+<input type="radio" name="antenna-type" value="dipole" checked />
+<span>Dipolo Simple</span>
+</label>
+<label class="radio-option">
+<input type="radio" name="antenna-type" value="monopole" />
+<span>Monopolo</span>
+</label>
+<label class="radio-option">
+<input type="radio" name="antenna-type" value="array" />
+<span>Arreglo de Dos Elementos</span>
+</label>
+<label class="radio-option">
+<input type="radio" name="antenna-type" value="yagi" />
+<span>Antena Yagi Simplificada</span>
+</label>
+</div>
+</section>
+<section class="control-group active" id="dipole-controls" aria-labelledby="dipole-title">
+<h3 id="dipole-title">Parámetros del Dipolo</h3>
+<div class="control-item" data-tooltip="Longitud del dipolo en longitudes de onda (λ)">
+<label for="dipole-length">Longitud (λ):</label>
+<div class="slider-container">
+<input type="range" id="dipole-length" min="0.1" max="1" step="0.01" value="0.5" />
+<div class="value-display" id="dipole-length-value">0.50</div>
+</div>
+</div>
+</section>
+<section class="control-group" id="monopole-controls" aria-labelledby="monopole-title">
+<h3 id="monopole-title">Parámetros del Monopolo</h3>
+<div class="control-item" data-tooltip="Longitud del monopolo en longitudes de onda (λ)">
+<label for="monopole-length">Longitud (λ):</label>
+<div class="slider-container">
+<input type="range" id="monopole-length" min="0.1" max="0.5" step="0.01" value="0.25" />
+<div class="value-display" id="monopole-length-value">0.25</div>
+</div>
+</div>
+</section>
+<section class="control-group" id="array-controls" aria-labelledby="array-title">
+<h3 id="array-title">Parámetros del Arreglo</h3>
+<div class="control-item" data-tooltip="Distancia entre elementos del arreglo en longitudes de onda">
+<label for="element-spacing">Separación entre elementos (λ):</label>
+<div class="slider-container">
+<input type="range" id="element-spacing" min="0.1" max="1" step="0.01" value="0.5" />
+<div class="value-display" id="element-spacing-value">0.50</div>
+</div>
+</div>
+<div class="control-item" data-tooltip="Diferencia de fase entre elementos en grados">
+<label for="phase-difference">Diferencia de fase (°):</label>
+<div class="slider-container">
+<input type="range" id="phase-difference" min="0" max="180" step="1" value="0" />
+<div class="value-display" id="phase-difference-value">0°</div>
+</div>
+</div>
+</section>
+<section class="control-group" id="yagi-controls" aria-labelledby="yagi-title">
+<h3 id="yagi-title">Parámetros de la Antena Yagi</h3>
+<div class="control-item" data-tooltip="Número de elementos directores de la antena">
+<label for="director-elements">Número de elementos directores:</label>
+<div class="slider-container">
+<input type="range" id="director-elements" min="1" max="10" step="1" value="3" />
+<div class="value-display" id="director-elements-value">3</div>
+</div>
+</div>
+</section>
+<div class="action-buttons">
+<button class="btn" type="button" id="reset-btn">Restablecer Valores</button>
+<button class="btn" type="button" id="screenshot-btn">Capturar Pantalla</button>
+</div>
+</aside>
+<section class="visualization-container" aria-label="Panel de visualizaciones">
+<div class="visualization-panel" data-panel="azimuth">
+<div class="auto-update-indicator">ACTUALIZANDO</div>
+<div class="panel-header">
+<h2>Patrón de Radiación - Plano Azimutal</h2>
+<div class="view-options" role="group" aria-label="Modo de vista azimutal">
+<button class="view-option active" type="button" data-view="gain">Ganancia (dBi)</button>
+<button class="view-option" type="button" data-view="power">Potencia Normalizada</button>
+</div>
+</div>
+<div class="canvas-container">
+<canvas id="azimuth-pattern" width="400" height="400" aria-label="Patrón azimutal"></canvas>
+</div>
+<div class="color-legend" aria-hidden="true"></div>
+<div class="legend-labels" aria-hidden="true">
+<span>-40 dB</span><span>-20 dB</span><span>0 dB</span><span>20 dB</span><span>40 dB</span>
+</div>
+</div>
+<div class="visualization-panel" data-panel="elevation">
+<div class="auto-update-indicator">ACTUALIZANDO</div>
+<div class="panel-header">
+<h2>Patrón de Radiación - Plano de Elevación</h2>
+<div class="view-options" role="group" aria-label="Modo de vista elevación">
+<button class="view-option active" type="button" data-view="gain">Ganancia (dBi)</button>
+<button class="view-option" type="button" data-view="power">Potencia Normalizada</button>
+</div>
+</div>
+<div class="canvas-container">
+<canvas id="elevation-pattern" width="400" height="400" aria-label="Patrón de elevación"></canvas>
+</div>
+<div class="color-legend" aria-hidden="true"></div>
+<div class="legend-labels" aria-hidden="true">
+<span>-40 dB</span><span>-20 dB</span><span>0 dB</span><span>20 dB</span><span>40 dB</span>
+</div>
+</div>
+<div class="visualization-panel" style="grid-column:1 / -1;" data-panel="3d">
+<div class="auto-update-indicator">ACTUALIZANDO</div>
+<div class="panel-header">
+<h2>Visualización 3D del Patrón de Radiación</h2>
+<div class="view-options" role="group" aria-label="Modo de vista 3D">
+<button class="view-option active" type="button" data-view="gain">Ganancia (dBi)</button>
+<button class="view-option" type="button" data-view="power">Potencia Normalizada</button>
+</div>
+</div>
+<div class="canvas-container">
+<canvas id="3d-pattern" width="800" height="400" aria-label="Patrón 3D"></canvas>
+</div>
+<div class="color-legend" aria-hidden="true"></div>
+<div class="legend-labels" aria-hidden="true">
+<span>-40 dB</span><span>-20 dB</span><span>0 dB</span><span>20 dB</span><span>40 dB</span>
+</div>
+</div>
+</section>
+<section class="results-panel" aria-label="Resultados calculados">
+<h2>Parámetros de la Antena</h2>
+<div class="results-grid" aria-live="polite">
+<div class="result-item">
+<div class="result-label">Ganancia Directiva</div>
+<div class="result-value" id="gain-value">2.15 dBi</div>
+</div>
+<div class="result-item">
+<div class="result-label">Ancho del Haz (3dB)</div>
+<div class="result-value" id="beamwidth-value">78°</div>
+</div>
+<div class="result-item">
+<div class="result-label">Relación Frente-Espalda</div>
+<div class="result-value" id="fb-ratio-value">20 dB</div>
+</div>
+<div class="result-item">
+<div class="result-label">Eficiencia de Radiación</div>
+<div class="result-value" id="efficiency-value">95%</div>
+</div>
+</div>
+</section>
+</main>
+<footer>
+<h3>Conceptos Básicos de Antenas</h3>
+<p>Las antenas convierten energía eléctrica en ondas electromagnéticas y viceversa. El patrón de radiación describe la dirección e intensidad de la energía radiada.</p>
+<p>La ganancia indica la capacidad de dirigir energía en una dirección en comparación con una antena isotrópica.</p>
+<div class="resources">
+<a href="https://www.antenna-theory.com/" target="_blank" rel="noopener" class="resource-link">Teoría de Antenas</a>
+<a href="https://www.ece.rutgers.edu/~orfanidi/ewa/" target="_blank" rel="noopener" class="resource-link">Electromagnética y Antenas</a>
+<a href="https://www.itu.int/en/Pages/default.aspx" target="_blank" rel="noopener" class="resource-link">UIT - Recursos</a>
+</div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
